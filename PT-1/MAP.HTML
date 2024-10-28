@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vehicle Tracking Simulation</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+        #map { height: 500px; }
+    </style>
+</head>
+<body>
+    <h1>Vehicle Tracking Simulation</h1>
+    <div id="map"></div>
+    
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+        // Initialize the map and set a default view
+        var map = L.map('map').setView([13.0827, 80.2707], 13); // Centered on Chennai by default
+
+        // Add OpenStreetMap tiles
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+        }).addTo(map);
+
+        // Define the bounds (restricted area) - Example around central Chennai
+        const bounds = L.latLngBounds(
+            [13.0800, 80.2650], // Southwest corner of the area
+            [13.1000, 80.2900]  // Northeast corner of the area
+        );
+        
+        // Predefined route coordinates within the bounds
+        const route = [
+            [13.0827, 80.2707],
+            [13.0850, 80.2750],
+            [13.0875, 80.2780],
+            [13.0890, 80.2810],
+            [13.0900, 80.2850],
+            [13.0850, 80.2800], 
+            [13.0827, 80.2707] // Loop back to start
+        ];
+
+        // Restrict the map view to the bounds
+        map.setMaxBounds(bounds);
+        map.setMinZoom(13); // Optional: Set minimum zoom level for a closer view
+
+        // Marker for the vehicle
+        var vehicleMarker = L.marker(route[0]).addTo(map)
+            .bindPopup('Vehicle Location')
+            .openPopup();
+
+        let index = 0; // Track the current position in the route array
+
+        // Function to move the vehicle marker along the route
+        function moveVehicle() {
+            // Update the marker's position to the next coordinates in the route
+            vehicleMarker.setLatLng(route[index]);
+            map.panTo(route[index]); // Center the map on the marker
+            
+            // Increment index to move to the next position; loop back if at the end
+            index = (index + 1) % route.length;
+
+            // Repeat the movement every second (1000 ms)
+            setTimeout(moveVehicle, 1000);
+        }
+
+        // Start the movement
+        moveVehicle();
+    </script>
+</body>
+</html>
